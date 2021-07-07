@@ -6,7 +6,7 @@ inputs:
     required: true
   asana-token:
     description: 'Asana access token'
-    required: false
+    required: true
 outputs:
   taskTitle:
     description: 'The title of the task'
