@@ -1,6 +1,8 @@
 # Container image that runs your code
 FROM python:3.8-alpine
 
+RUN pip3 install requests
+
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY get_asana_task_info.py /get_asana_task_info.py
 COPY entrypoint.sh /entrypoint.sh
