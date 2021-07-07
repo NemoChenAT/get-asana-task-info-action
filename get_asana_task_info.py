@@ -22,6 +22,10 @@ class AsanaAPIRequest():
                      'link': task['permalink_url']}
         return task_info
 
+    def get_task_title(self, taskId):
+        info = self.get_task_info(taskId)
+        return info['name']
+
     def get_task(self, taskId):
         task = self.get_json(f'https://app.asana.com/api/1.0/tasks/{taskId}')
         return task
@@ -61,11 +65,11 @@ class AsanaAPIRequest():
         return error
 
 
-def get_asana_task_info(task_url, access_token):
+def get_asana_task_title(task_url, access_token):
     task_id = getAsanaTaskId(task_url)
     asana_api_request = AsanaAPIRequest(access_token=access_token)
-    task_info = asana_api_request.get_task_info(task_id)
-    return task_info
+    task_title = asana_api_request.get_task_title(task_id)
+    return task_title
 
 
 def getAsanaTaskId(task_url):
@@ -73,14 +77,13 @@ def getAsanaTaskId(task_url):
 
 
 def show_github_issue(asana_task_info):
-    print(asana_task_info)
+    print(asana_task_info['name'])
 
 
 def main(args):
     """ get_asana_task_info.py [task_url] [access_token]
     """
-    asana_task_info = get_asana_task_info(args[1], args[2])
-    show_github_issue(asana_task_info)
+    print(get_asana_task_title(args[1], args[2]))
 
 
 if __name__ == '__main__':
