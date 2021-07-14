@@ -5,6 +5,7 @@
 #
 
 import sys
+import json
 import requests
 
 
@@ -102,7 +103,8 @@ def show_github_issue(asana_task_info):
 def main(args):
     """ get_asana_task_info.py [task_url] [access_token] [distance_to_root]
     """
-    print(get_asana_task_info(args[1], args[2], args[3]))
+    task_info = get_asana_task_info(args[1], args[2], args[3])
+    print(json.dumps(task_info))
 
 
 if __name__ == '__main__':
