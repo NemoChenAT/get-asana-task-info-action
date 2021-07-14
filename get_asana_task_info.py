@@ -9,22 +9,11 @@ import requests
 
 
 class AsanaAPIRequest():
-
     def __init__(self, access_token):
         self.__access_token = access_token
         self.s = requests.Session()
         self.s.headers = {
             "Authorization": f"Bearer {self.__access_token}", 'Accept': 'application/json'}
-
-    def get_task_info(self, taskId):
-        task = self.get_task(taskId)
-        task_info = {'name': task['name'],
-                     'link': task['permalink_url']}
-        return task_info
-
-    def get_task_title(self, taskId):
-        info = self.get_task_info(taskId)
-        return info['name']
 
     def get_task(self, taskId):
         task = self.get_json(f'https://app.asana.com/api/1.0/tasks/{taskId}')
@@ -65,14 +54,44 @@ class AsanaAPIRequest():
         return error
 
 
-def get_asana_task_title(task_url, access_token):
-    task_id = getAsanaTaskId(task_url)
-    asana_api_request = AsanaAPIRequest(access_token=access_token)
-    task_title = asana_api_request.get_task_title(task_id)
-    return task_title
+class AsanaRequest():
+    def __init__(self, access_token):
+        self.__access_token = access_token
+        self.asana_api_request = AsanaAPIRequest(access_token=access_token)
+
+    def get_task_info(self, task_id):
+        task_data = self.__get_task_data(task_id)
+        return self.__get_task_info_from_task_data(task_data)
+
+    def get_parent_task_info(self, task_id, distance_to_target_parent=1):
+        task_data = self.__get_task_data(task_id)
+        if (distance_to_target_parent == 0):
+            return self.__get_task_info_from_task_data(task_data)
+        else:
+            return self.get_parent_task_info(task_data['parent']['gid'],
+                                             int(distance_to_target_parent) - 1)
+
+    def __get_task_data(self, task_id):
+        return self.asana_api_request.get_task(task_id)
+
+    def __get_task_info_from_task_data(self, task_data):
+        return {'name': task_data['name'],
+                'link': task_data['permalink_url']}
 
 
-def getAsanaTaskId(task_url):
+def get_asana_task_info(task_url, access_token, distance_to_root):
+    task_id = get_asana_taskId(task_url)
+    asana_request = AsanaRequest(access_token=access_token)
+
+    task_info = asana_request.get_task_info(task_id)
+    root_task_info = asana_request.get_parent_task_info(
+        task_id, distance_to_root)
+    task_info['root'] = root_task_info
+
+    return task_info
+
+
+def get_asana_taskId(task_url):
     return task_url.rsplit('/', 1).pop()
 
 
@@ -81,9 +100,9 @@ def show_github_issue(asana_task_info):
 
 
 def main(args):
-    """ get_asana_task_info.py [task_url] [access_token]
+    """ get_asana_task_info.py [task_url] [access_token] [distance_to_root]
     """
-    print(get_asana_task_title(args[1], args[2]))
+    print(get_asana_task_info(args[1], args[2], args[3]))
 
 
 if __name__ == '__main__':
