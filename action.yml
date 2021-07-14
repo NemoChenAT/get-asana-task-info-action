@@ -1,19 +1,23 @@
 name: 'Get Task Info'
 description: 'Greet someone and record the time'
 inputs:
-  task-url:
+  task_url:
     description: 'Asana task url'
     required: true
-  asana-token:
+  asana_token:
     description: 'Asana access token'
     required: true
+  distance_to_root:
+    description: 'Distance to root task'
+    required: true
 outputs:
-  taskTitle:
-    description: 'The title of the task'
+  task_info:
+    description: 'The Info of the task'
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.task-url }}
-    - ${{ inputs.asana-token }}
+    - ${{ inputs.task_url }}
+    - ${{ inputs.asana_token }}
+    - ${{ inputs.distance_to_root }}
